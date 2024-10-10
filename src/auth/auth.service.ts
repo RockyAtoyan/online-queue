@@ -6,7 +6,6 @@ import {
 import { CompaniesService } from '../companies/companies.service';
 import { compareSync, hashSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { DbService } from '../db/db.service';
 import * as process from 'process';
 
 @Injectable()
