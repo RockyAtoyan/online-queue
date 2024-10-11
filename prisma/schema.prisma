@@ -22,36 +22,58 @@ model Company {
 }
 
 model Event {
-  id         String    @id @default(uuid())
-  name       String
-  companyId  String
-  company    Company   @relation(fields: [companyId], references: [id])
-  scheduleId String?
-  schedule   Schedule?
+  id           String        @id @default(uuid())
+  name         String
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  schedule     Schedule?
+  appointments Appointment[]
 }
 
 model Schedule {
   id      String @id @default(uuid())
-  event   Event  @relation(fields: [eventId], references: [id])
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId String @unique
   times   Time[]
 }
 
 model Time {
-  id         String    @id @default(uuid())
-  date       DateTime
-  times      String[]
-  scheduleId String
-  schedule   Schedule  @relation(fields: [scheduleId], references: [id])
-  customerId String
-  customer   Customer?
+  id           String        @id @default(uuid())
+  weekDay      Int 
+  times        Duration[]
+  scheduleId   String
+  schedule     Schedule      @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
 }
 
 model Customer {
-  id     String @id @default(uuid())
-  name   String
-  phone  String
-  email  String
-  timeId String @unique
-  time   Time   @relation(fields: [timeId], references: [id])
+  id            String      @id @default(uuid())
+  name          String
+  phone         String
+  email         String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId String      @unique
+}
+
+model Appointment {
+  id         String   @id @default(uuid())
+  date       DateTime
+  weekDay    Int?
+  timeId     String?
+  customerId String?
+  eventId    String
+  durationId String
+
+  event    Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  duration Duration  @relation(fields: [durationId], references: [id], onDelete: Cascade)
+  time     Time?     @relation(fields: [timeId], references: [id], onDelete: Cascade)
+  customer Customer?
+}
+
+model Duration {
+  id           String        @id @default(uuid())
+  from         String
+  to           String
+  appointments Appointment[]
+  times        Time[]
 }

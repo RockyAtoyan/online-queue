@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TimesService } from './times.service';
 import { CreateTimeDto } from './dto/create-time.dto';
 import { UpdateTimeDto } from './dto/update-time.dto';
@@ -12,23 +12,13 @@ export class TimesController {
     return this.timesService.create(createTimeDto);
   }
 
-  @Get()
-  findAll() {
-    return this.timesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.timesService.findOne(+id);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTimeDto: UpdateTimeDto) {
-    return this.timesService.update(+id, updateTimeDto);
+    return this.timesService.update(id, updateTimeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.timesService.remove(+id);
+    return this.timesService.remove(id);
   }
 }

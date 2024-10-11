@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDurationDto } from './dto/create-duration.dto';
-import { UpdateDurationDto } from './dto/update-duration.dto';
+import { DbService } from '../db/db.service';
 
 @Injectable()
 export class DurationsService {
-  create(createDurationDto: CreateDurationDto) {
-    return 'This action adds a new duration';
+  constructor(private dbService: DbService) {}
+
+  async create(createDurationDto: CreateDurationDto) {
+    try {
+      const candidate = await this.dbService.duration.findFirst({
+        where: createDurationDto,
+      });
+      if (candidate) return candidate;
+      return this.dbService.duration.create({
+        data: createDurationDto,
+      });
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
-  findAll() {
-    return `This action returns all durations`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} duration`;
-  }
-
-  update(id: number, updateDurationDto: UpdateDurationDto) {
-    return `This action updates a #${id} duration`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} duration`;
+  async remove(id: string) {
+    try {
+      return this.dbService.duration.delete({
+        where: { id },
+      });
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
   }
 }
