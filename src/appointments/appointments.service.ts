@@ -1,3 +1,4 @@
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { DurationsService } from 'src/durations/durations.service';
 import {
   BadRequestException,
@@ -8,23 +9,24 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { DbService } from '../db/db.service';
 import { PrismaClient } from '@prisma/client';
+import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 
 @Injectable()
 export class AppointmentsService {
   constructor(
+    private txHost: TransactionHost<TransactionalAdapterPrisma>,
     private dbService: DbService,
     private durationsService: DurationsService,
   ) {}
 
   async create(createAppointmentDto: CreateAppointmentDto, tx?: PrismaClient) {
-    const dbClient = tx || this.dbService;
     try {
       const { duration: time, ...appointmentDto } = createAppointmentDto;
       const duration = await this.durationsService.create(
         createAppointmentDto.duration,
         tx,
       );
-      const appointment = await dbClient.appointment.create({
+      const appointment = await this.txHost.tx.appointment.create({
         data: {
           ...appointmentDto,
           durationId: duration.id,
@@ -47,26 +49,24 @@ export class AppointmentsService {
     }
   }
 
+  @Transactional()
   async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
-    return this.dbService.$transaction(async (tx) => {
-      try {
-        const { duration: time, ...appointmentDto } = updateAppointmentDto;
-        const duration = await this.durationsService.create(
-          updateAppointmentDto.duration,
-          tx as PrismaClient,
-        );
-        const appointment = await tx.appointment.update({
-          where: { id },
-          data: {
-            ...appointmentDto,
-            durationId: duration.id,
-          },
-        });
-        return appointment;
-      } catch (e) {
-        throw new BadRequestException(e.message);
-      }
-    });
+    try {
+      const { duration: time, ...appointmentDto } = updateAppointmentDto;
+      const duration = await this.durationsService.create(
+        updateAppointmentDto.duration,
+      );
+      const appointment = await this.txHost.tx.appointment.update({
+        where: { id },
+        data: {
+          ...appointmentDto,
+          durationId: duration.id,
+        },
+      });
+      return appointment;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   async remove(id: string) {

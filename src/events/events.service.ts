@@ -1,3 +1,4 @@
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import {
   BadRequestException,
   Injectable,
@@ -7,36 +8,33 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { DbService } from '../db/db.service';
 import { SchedulesService } from '../schedules/schedules.service';
-import { PrismaClient } from '@prisma/client';
+import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 
 @Injectable()
 export class EventsService {
   constructor(
+    private txHost: TransactionHost<TransactionalAdapterPrisma>,
     private dbService: DbService,
     private schedulesService: SchedulesService,
   ) {}
 
+  @Transactional()
   async create(companyId: string, createEventDto: CreateEventDto) {
-    return this.dbService.$transaction(async (tx) => {
-      try {
-        const { schedule, ...eventDto } = createEventDto;
-        const event = await tx.event.create({
-          data: { ...eventDto, companyId },
+    try {
+      const { schedule, ...eventDto } = createEventDto;
+      const event = await this.txHost.tx.event.create({
+        data: { ...eventDto, companyId },
+      });
+      if (schedule) {
+        const eventSchedule = await this.schedulesService.create({
+          ...schedule,
+          eventId: event['id'],
         });
-        if (schedule) {
-          const eventSchedule = await this.schedulesService.create(
-            {
-              ...schedule,
-              eventId: event['id'],
-            },
-            tx as PrismaClient,
-          );
-        }
-        return event;
-      } catch (e) {
-        throw new BadRequestException(e.message);
       }
-    });
+      return event;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   async findAll(companyId: string) {

@@ -1,3 +1,4 @@
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import {
   BadRequestException,
   Injectable,
@@ -6,19 +7,22 @@ import {
 import { CreateDurationDto } from './dto/create-duration.dto';
 import { DbService } from '../db/db.service';
 import { PrismaClient } from '@prisma/client';
+import { TransactionHost } from '@nestjs-cls/transactional';
 
 @Injectable()
 export class DurationsService {
-  constructor(private dbService: DbService) {}
+  constructor(
+    private txHost: TransactionHost<TransactionalAdapterPrisma>,
+    private dbService: DbService,
+  ) {}
 
   async create(createDurationDto: CreateDurationDto, tx?: PrismaClient) {
-    const dbClient = tx || this.dbService;
     try {
-      const candidate = await dbClient.duration.findFirst({
+      const candidate = await this.txHost.tx.duration.findFirst({
         where: createDurationDto,
       });
       if (candidate) return candidate;
-      return dbClient.duration.create({
+      return this.txHost.tx.duration.create({
         data: createDurationDto,
       });
     } catch (e) {

@@ -13,9 +13,33 @@ import { TimesModule } from './times/times.module';
 import { CustomersModule } from './customers/customers.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { DurationsModule } from './durations/durations.module';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { ClsModule } from 'nestjs-cls';
+import { DbService } from './db/db.service';
+import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 
 @Module({
-  imports: [DbModule, AuthModule, CompaniesModule, EventsModule, SchedulesModule, TimesModule, CustomersModule, AppointmentsModule, DurationsModule],
+  imports: [
+    ClsModule.forRoot({
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [DbModule],
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: DbService,
+          }),
+        }),
+      ],
+    }),
+    DbModule,
+    AuthModule,
+    CompaniesModule,
+    EventsModule,
+    SchedulesModule,
+    TimesModule,
+    CustomersModule,
+    AppointmentsModule,
+    DurationsModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
