@@ -5,18 +5,20 @@ import {
 } from '@nestjs/common';
 import { CreateDurationDto } from './dto/create-duration.dto';
 import { DbService } from '../db/db.service';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class DurationsService {
   constructor(private dbService: DbService) {}
 
-  async create(createDurationDto: CreateDurationDto) {
+  async create(createDurationDto: CreateDurationDto, tx?: PrismaClient) {
+    const dbClient = tx || this.dbService;
     try {
-      const candidate = await this.dbService.duration.findFirst({
+      const candidate = await dbClient.duration.findFirst({
         where: createDurationDto,
       });
       if (candidate) return candidate;
-      return this.dbService.duration.create({
+      return dbClient.duration.create({
         data: createDurationDto,
       });
     } catch (e) {

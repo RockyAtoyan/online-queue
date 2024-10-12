@@ -7,6 +7,7 @@ import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { DbService } from '../db/db.service';
 import { TimesService } from '../times/times.service';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class SchedulesService {
@@ -15,14 +16,22 @@ export class SchedulesService {
     private timesService: TimesService,
   ) {}
 
-  async create(createScheduleDto: CreateScheduleDto) {
+  async create(createScheduleDto: CreateScheduleDto, tx?: PrismaClient) {
+    const dbClient = tx || this.dbService;
     try {
       const { times, ...scheduleDto } = createScheduleDto;
-      const schedule = await this.dbService.schedule.create({
+      const schedule = await dbClient.schedule.create({
         data: scheduleDto,
       });
       for (const time of times) {
-        await this.timesService.create({ ...time, scheduleId: schedule['id'] });
+        await this.timesService.create(
+          {
+            ...time,
+            scheduleId: schedule['id'],
+            eventId: schedule.eventId,
+          },
+          tx,
+        );
       }
       return schedule;
     } catch (e) {
@@ -31,27 +40,36 @@ export class SchedulesService {
   }
 
   async update(id: string, updateScheduleDto: UpdateScheduleDto) {
-    try {
-      const { times, ...scheduleDto } = updateScheduleDto;
-      const schedule = await this.dbService.schedule.update({
-        where: { id },
-        data: scheduleDto,
-        include: {
-          times: true,
-        },
-      });
-      for (const time of schedule.times) {
-        await this.timesService.remove(time.id);
+    return this.dbService.$transaction(async (tx) => {
+      try {
+        const { times, ...scheduleDto } = updateScheduleDto;
+        const schedule = await tx.schedule.update({
+          where: { id },
+          data: scheduleDto,
+          include: {
+            times: true,
+          },
+        });
+        for (const time of schedule.times) {
+          await tx.time.delete({ where: { id: time.id } });
+        }
+        for (const time of times) {
+          await this.timesService.create(
+            {
+              ...time,
+              scheduleId: schedule.id,
+              eventId: schedule.eventId,
+            },
+            tx as PrismaClient,
+          );
+        }
+        return await tx.schedule.findUnique({
+          where: { id: schedule.id },
+        });
+      } catch (e) {
+        throw new BadRequestException(e.message);
       }
-      for (const time of times) {
-        await this.timesService.create({ ...time, scheduleId: schedule.id });
-      }
-      return await this.dbService.schedule.findUnique({
-        where: { id: schedule.id },
-      });
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
+    });
   }
 
   async remove(id: string) {

@@ -8,6 +8,9 @@ export class CreateTimeDto {
   scheduleId: string;
 
   @IsNotEmpty()
+  eventId: string;
+
+  @IsNotEmpty()
   weekDay: number;
 
   @IsNotEmpty()

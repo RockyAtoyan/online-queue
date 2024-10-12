@@ -8,7 +8,7 @@ import { CreateTimeDto } from './dto/create-time.dto';
 import { UpdateTimeDto } from './dto/update-time.dto';
 import { DbService } from '../db/db.service';
 import { DurationsService } from '../durations/durations.service';
-import { Appointment, Duration } from '@prisma/client';
+import { Appointment, Duration, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class TimesService {
@@ -18,20 +18,21 @@ export class TimesService {
     private appointmentsService: AppointmentsService,
   ) {}
 
-  async create(createTimeDto: CreateTimeDto) {
+  async create(createTimeDto: CreateTimeDto, tx?: PrismaClient) {
+    const dbClient = tx || this.dbService;
     try {
       const { appointments: apps, times, ...timeDto } = createTimeDto;
       const durations: Duration[] = [];
       for (const duration of times) {
-        durations.push(await this.durationService.create({ ...duration }));
+        durations.push(await this.durationService.create({ ...duration }, tx));
       }
       const appointments: Appointment[] = [];
       for (const appointment of apps) {
         appointments.push(
-          await this.appointmentsService.create({ ...appointment }),
+          await this.appointmentsService.create({ ...appointment }, tx),
         );
       }
-      const time = await this.dbService.time.create({
+      const time = await dbClient.time.create({
         data: {
           ...timeDto,
           times: {

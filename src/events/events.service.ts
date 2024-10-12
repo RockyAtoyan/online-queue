@@ -7,6 +7,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { DbService } from '../db/db.service';
 import { SchedulesService } from '../schedules/schedules.service';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class EventsService {
@@ -16,21 +17,26 @@ export class EventsService {
   ) {}
 
   async create(companyId: string, createEventDto: CreateEventDto) {
-    try {
-      const { schedule, ...eventDto } = createEventDto;
-      const event = await this.dbService.event.create({
-        data: { ...eventDto, companyId },
-      });
-      if (schedule) {
-        const eventSchedule = await this.schedulesService.create({
-          ...schedule,
-          eventId: event['id'],
+    return this.dbService.$transaction(async (tx) => {
+      try {
+        const { schedule, ...eventDto } = createEventDto;
+        const event = await tx.event.create({
+          data: { ...eventDto, companyId },
         });
+        if (schedule) {
+          const eventSchedule = await this.schedulesService.create(
+            {
+              ...schedule,
+              eventId: event['id'],
+            },
+            tx as PrismaClient,
+          );
+        }
+        return event;
+      } catch (e) {
+        throw new BadRequestException(e.message);
       }
-      return event;
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
+    });
   }
 
   async findAll(companyId: string) {
