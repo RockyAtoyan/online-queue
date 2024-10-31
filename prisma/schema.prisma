@@ -39,7 +39,7 @@ model Schedule {
 
 model Time {
   id           String        @id @default(uuid())
-  weekDay      Int 
+  weekDay      Int
   times        Duration[]
   scheduleId   String
   schedule     Schedule      @relation(fields: [scheduleId], references: [id], onDelete: Cascade)

@@ -17,6 +17,7 @@ import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-pr
 import { ClsModule } from 'nestjs-cls';
 import { DbService } from './db/db.service';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional';
     CustomersModule,
     AppointmentsModule,
     DurationsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
