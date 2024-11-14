@@ -1,16 +1,16 @@
+import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { AppointmentsService } from './../appointments/appointments.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateTimeDto } from './dto/create-time.dto';
-import { UpdateTimeDto } from './dto/update-time.dto';
+import { Appointment, Duration, PrismaClient } from '@prisma/client';
 import { DbService } from '../db/db.service';
 import { DurationsService } from '../durations/durations.service';
-import { Appointment, Duration, PrismaClient } from '@prisma/client';
-import { TransactionHost } from '@nestjs-cls/transactional';
+import { AppointmentsService } from './../appointments/appointments.service';
+import { CreateTimeDto } from './dto/create-time.dto';
+import { UpdateTimeDto } from './dto/update-time.dto';
 
 @Injectable()
 export class TimesService {
@@ -31,7 +31,10 @@ export class TimesService {
       const appointments: Appointment[] = [];
       for (const appointment of apps) {
         appointments.push(
-          await this.appointmentsService.create({ ...appointment }, tx),
+          await this.appointmentsService.create(
+            { ...appointment, eventId, weekDay: timeDto.weekDay },
+            tx,
+          ),
         );
       }
       const time = await this.txHost.tx.time.create({

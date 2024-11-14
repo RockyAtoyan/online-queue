@@ -1,14 +1,14 @@
+import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { DbService } from '../db/db.service';
 import { SchedulesService } from '../schedules/schedules.service';
-import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
@@ -33,6 +33,7 @@ export class EventsService {
       }
       return event;
     } catch (e) {
+      console.log(e);
       throw new BadRequestException(e.message);
     }
   }
@@ -113,15 +114,26 @@ export class EventsService {
     }
   }
 
+  @Transactional()
   async update(id: string, companyId: string, updateEventDto: UpdateEventDto) {
     try {
-      const event = await this.dbService.event.update({
+      const event = await this.txHost.tx.event.update({
         where: { id },
         data: {
           name: updateEventDto.name,
           companyId: companyId,
         },
+        include: {
+          schedule: true,
+        },
       });
+      if (updateEventDto.schedule) {
+        await this.schedulesService.remove(event.schedule.id);
+        const eventSchedule = await this.schedulesService.create({
+          ...updateEventDto.schedule,
+          eventId: event['id'],
+        });
+      }
       return event;
     } catch (e) {
       throw new BadRequestException(e.message);

@@ -3,10 +3,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CompaniesService } from '../companies/companies.service';
-import { compareSync, hashSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { compareSync, hashSync } from 'bcrypt';
 import * as process from 'process';
+import { CompaniesService } from '../companies/companies.service';
 
 @Injectable()
 export class AuthService {

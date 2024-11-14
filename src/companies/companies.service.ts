@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { DbService } from '../db/db.service';
 import { Prisma } from '@prisma/client';
+import { DbService } from '../db/db.service';
 
 @Injectable()
 export class CompaniesService {
@@ -10,6 +10,15 @@ export class CompaniesService {
     const company = this.dbService.company.findUnique({
       where: {
         email,
+      },
+      include: {
+        events: {
+          include: {
+            appointments: {
+              include: { duration: true, event: true },
+            },
+          },
+        },
       },
     });
     return company;

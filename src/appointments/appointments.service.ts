@@ -1,15 +1,15 @@
+import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { DurationsService } from 'src/durations/durations.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { DurationsService } from 'src/durations/durations.service';
+import { DbService } from '../db/db.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
-import { DbService } from '../db/db.service';
-import { PrismaClient } from '@prisma/client';
-import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
 
 @Injectable()
 export class AppointmentsService {
@@ -30,6 +30,9 @@ export class AppointmentsService {
         data: {
           ...appointmentDto,
           durationId: duration.id,
+        },
+        include: {
+          event: true,
         },
       });
       return appointment;
