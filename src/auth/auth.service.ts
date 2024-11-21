@@ -33,10 +33,13 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     const { password: pass, ...result } = company;
-    const accessToken = await this.jwtService.signAsync(result, {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '90d',
-    });
+    const accessToken = await this.jwtService.signAsync(
+      { email: result.email, id: result.id, name: result.name },
+      {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '90d',
+      },
+    );
     return { accessToken, ...result };
   }
 

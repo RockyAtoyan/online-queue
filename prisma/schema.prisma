@@ -19,6 +19,7 @@ model Company {
   name     String
   password String
   events   Event[]
+  widget   Widget?
 }
 
 model Event {
@@ -76,4 +77,10 @@ model Duration {
   to           String
   appointments Appointment[]
   times        Time[]
+}
+
+model Widget {
+  id        String  @id @default(uuid())
+  companyId String  @unique
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
