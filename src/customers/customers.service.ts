@@ -31,7 +31,7 @@ export class CustomersService {
           },
         },
       });
-      await this.mailService.sendCustomerAppointment(customer);
+      // await this.mailService.sendCustomerAppointment(customer);
       return customer;
     } catch (e) {
       throw new BadRequestException(e.message);

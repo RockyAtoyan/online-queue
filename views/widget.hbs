@@ -1,4 +1,22 @@
-<div>
-  <p>Name: {{name}}</p>
-  <p>Email: {{email}}</p>
+<div class='online-queue-widget'>
+  <div class='online-queue-widget__inner'>
+    <div class='online-queue-widget__company'>
+      <p>Name: {{name}}</p>
+      <p>Email: {{email}}</p>
+    </div>
+    <div id='online-queue-calendar'></div>
+    <form
+      id='online-queue-form'
+      action='http://localhost:3000/customers'
+      method='post'
+    >
+      <div id='info'></div>
+      <input type='email' placeholder='email' name='email' required />
+      <input type='text' placeholder='name' name='name' required />
+      <input type='tel' placeholder='phone' name='phone' required />
+      <input id='appointmentId' type='text' name='appointmentId' hidden />
+      <button type='submit'>Записаться</button>
+      <button type='button' class='close'>Назад</button>
+    </form>
+  </div>
 </div>

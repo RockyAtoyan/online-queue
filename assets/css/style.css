@@ -1,0 +1,102 @@
+@font-face {
+  font-family: Lorenzo;
+  src: url('../fonts/Lorenzo Sans Regular.ttf');
+}
+
+.online-queue-widget,
+.online-queue-widget * {
+  font-family: Lorenzo;
+  box-sizing: border-box;
+}
+
+.online-queue-widget__inner {
+  position: relative;
+  overflow: hidden;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px rgb(113, 113, 113) solid;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#online-queue-form {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  visibility: hidden;
+}
+
+#online-queue-form #info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#online-queue-form.hidden {
+  animation: fadeOut 1s ease-in-out forwards;
+}
+
+#online-queue-form.active {
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+#online-queue-form .success,
+#online-queue-form .error {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  visibility: hidden;
+}
+
+#online-queue-form .success.hidden,
+#online-queue-form .error.hidden {
+  animation: fadeOut 1s ease-in-out forwards;
+}
+
+#online-queue-form .success.active,
+#online-queue-form .error.active {
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes fadeOut {
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+}

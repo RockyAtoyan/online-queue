@@ -24,6 +24,12 @@ export class WidgetsController {
     return this.widgetsService.findOne(id);
   }
 
+  @Public()
+  @Get(':id/appointments')
+  getWidgetAppointments(@Param('id') id) {
+    return this.widgetsService.getWidgetAppointments(id);
+  }
+
   @Post()
   create(@Body() createWidgetDto: CreateWidgetDto) {
     return this.widgetsService.create(createWidgetDto);
