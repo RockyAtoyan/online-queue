@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Render,
 } from '@nestjs/common';
 import { Public } from 'src/auth/decorators/auth-public.decorator';
 import { CreateWidgetDto } from './dto/create-widget.dto';
@@ -19,8 +18,7 @@ export class WidgetsController {
 
   @Public()
   @Get(':id')
-  @Render('widget')
-  findOne(@Param('id') id) {
+  async findOne(@Param('id') id) {
     return this.widgetsService.findOne(id);
   }
 
@@ -36,7 +34,7 @@ export class WidgetsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id, updateWidgetDto: UpdateWidgetDto) {
+  update(@Param('id') id, @Body() updateWidgetDto: UpdateWidgetDto) {
     return this.widgetsService.update(id, updateWidgetDto);
   }
 

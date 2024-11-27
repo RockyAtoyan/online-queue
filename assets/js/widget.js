@@ -31,11 +31,14 @@ class Widget {
           fetch(this.url_widget + '/appointments')
             .then((res) => res.json())
             .then((data) => {
-              const calendarEl = document.getElementById(
+              const calendarRoot = document.getElementById(
                 'online-queue-calendar',
               );
-              const calendar = new FullCalendar.Calendar(calendarEl, {
+              if (!calendarRoot) return;
+              calendarRoot.innerHTML = '';
+              const calendar = new FullCalendar.Calendar(calendarRoot, {
                 initialView: 'dayGridMonth',
+                locale: 'ru',
                 events: data,
                 eventClick: (eventInfo) => {
                   const info = {
@@ -111,20 +114,32 @@ class Widget {
     } catch (e) {}
   }
 
-  addStyle() {
+  addStyle(styles) {
     const style = document.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
     style.href = this.url_style;
     document.head.appendChild(style);
+    if (!styles) return;
+    const styleTag = document.createElement('style');
+    styleTag.innerHTML = `
+      :root {
+        --fc-border-color: ${styles.calendarBorder};
+      }
+    `;
+    document.head.appendChild(styleTag);
   }
 
-  addScripts() {
+  addScripts(locale = 'ru') {
     const script = document.createElement('script');
     script.src =
       'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js';
     script.setAttribute('defer', true);
     document.head.appendChild(script);
+    const localeScript = document.createElement('script');
+    localeScript.src = `https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/${locale}.global.js`;
+    localeScript.setAttribute('defer', true);
+    document.head.appendChild(localeScript);
   }
 
   openForm(event) {

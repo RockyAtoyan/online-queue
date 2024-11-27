@@ -80,7 +80,8 @@ model Duration {
 }
 
 model Widget {
-  id        String  @id @default(uuid())
-  companyId String  @unique
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id         String  @id @default(uuid())
+  companyId  String  @unique
+  company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customHtml String?
 }

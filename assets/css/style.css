@@ -3,21 +3,80 @@
   src: url('../fonts/Lorenzo Sans Regular.ttf');
 }
 
+@font-face {
+  font-family: RobotoCondensed;
+  src: url('../fonts/RobotoCondensed-Regular.ttf');
+}
+
+.fc-scroller::-webkit-scrollbar {
+  background: transparent;
+  width: 5px;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.1rem;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+  background: rgb(227, 227, 227);
+  border-radius: 10px;
+}
+
+.fc .fc-button-primary {
+  background: transparent;
+  color: #000;
+  border: 0;
+}
+
+.fc .fc-button-primary:hover,
+.fc .fc-button-primary:disabled,
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background: transparent;
+  border: 0;
+  color: #000;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 0.5rem;
+}
+
 .online-queue-widget,
 .online-queue-widget * {
-  font-family: Lorenzo;
+  font-family: RobotoCondensed;
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a.fc-event {
+  cursor: pointer;
 }
 
 .online-queue-widget__inner {
+  max-width: 800px;
   position: relative;
   overflow: hidden;
-  padding: 10px 20px;
+  padding: 30px;
   border-radius: 10px;
-  border: 1px rgb(113, 113, 113) solid;
+  border: 2px rgb(205, 205, 205) solid;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.online-queue-widget__company {
+}
+
+.online-queue-widget__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.online-queue-widget__text {
+  font-size: 0.9rem;
 }
 
 #online-queue-form {

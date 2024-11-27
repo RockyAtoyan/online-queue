@@ -12,6 +12,7 @@ export class CompaniesService {
         email,
       },
       include: {
+        widget: true,
         events: {
           include: {
             appointments: {

@@ -4,12 +4,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import * as hbs from 'express-handlebars';
 import { DbService } from './../db/db.service';
 import { CreateWidgetDto } from './dto/create-widget.dto';
 import { UpdateWidgetDto } from './dto/update-widget.dto';
 
 @Injectable()
 export class WidgetsService {
+  engine = hbs.create();
+
   constructor(private dvService: DbService) {}
 
   async findOne(id: string) {
@@ -38,8 +41,17 @@ export class WidgetsService {
           },
         },
       });
-
-      return { name: widget.company.name, email: widget.company.email };
+      const renderData = {
+        name: widget.company.name,
+        email: widget.company.email,
+      };
+      if (widget.customHtml) {
+        const template = this.engine.handlebars.compile(widget.customHtml, {});
+        const html = template(renderData);
+        return html;
+      }
+      const html = await this.engine.render('views/widget.hbs', renderData);
+      return html;
     } catch (error) {
       console.log(error);
       throw new NotFoundException({}, { cause: error });

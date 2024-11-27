@@ -1,10 +1,16 @@
 <div class='online-queue-widget'>
-  <div class='online-queue-widget__inner'>
+  <div
+    style='background: rgb(255, 255, 255);'
+    class='online-queue-widget__inner'
+  >
     <div class='online-queue-widget__company'>
-      <p>Name: {{name}}</p>
-      <p>Email: {{email}}</p>
+      <p class='online-queue-widget__title'>Запишитесь на прием в {{name}}.</p>
+      <p class='online-queue-widget__text'>Связаться с нами можно по почте
+        <span style='text-decoration: underline;'>{{email}}</span></p>
     </div>
-    <div id='online-queue-calendar'></div>
+    <div id='online-queue-calendar'>
+      <strong>Календарь</strong>
+    </div>
     <form
       id='online-queue-form'
       action='http://localhost:3000/customers'
