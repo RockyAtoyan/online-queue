@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { DurationsService } from 'src/durations/durations.service';
+import { MailService } from 'src/mail/mail.service';
 import { DbService } from '../db/db.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -17,6 +18,7 @@ export class AppointmentsService {
     private txHost: TransactionHost<TransactionalAdapterPrisma>,
     private dbService: DbService,
     private durationsService: DurationsService,
+    private mailService: MailService,
   ) {}
 
   async create(createAppointmentDto: CreateAppointmentDto, tx?: PrismaClient) {
@@ -76,7 +78,29 @@ export class AppointmentsService {
     try {
       const appointment = await this.dbService.appointment.delete({
         where: { id },
+        include: {
+          event: {
+            include: {
+              company: {
+                select: { name: true },
+              },
+            },
+          },
+          customer: {
+            include: {
+              appointment: {
+                include: {
+                  duration: true,
+                },
+              },
+            },
+          },
+        },
       });
+      await this.mailService.sendCustomerDeleteAppointmentMail(
+        appointment.event.company.name,
+        appointment.customer,
+      );
       return appointment;
     } catch (e) {
       throw new NotFoundException(e.message);

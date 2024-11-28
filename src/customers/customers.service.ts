@@ -26,12 +26,25 @@ export class CustomersService {
         include: {
           appointment: {
             include: {
+              event: {
+                include: {
+                  company: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
               duration: true,
             },
           },
         },
       });
-      // await this.mailService.sendCustomerAppointment(customer);
+      await this.mailService.sendCustomerAppointment(
+        customer.appointment.event.company.name,
+        customer.appointment.event.name,
+        customer,
+      );
       return customer;
     } catch (e) {
       throw new BadRequestException(e.message);

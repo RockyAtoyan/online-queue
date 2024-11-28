@@ -212,11 +212,11 @@ class Widget {
       <p>Произошла ошибка!</p>
       <button type="button" class="close">Назад</button>
     `;
-    error.classList.add('success');
+    error.classList.add('error');
     error.classList.add('active');
     form.appendChild(error);
     document
-      .querySelector('#online-queue-form .success .close')
+      .querySelector('#online-queue-form .error .close')
       .addEventListener('click', () => {
         this.closeError();
         this.closeForm();

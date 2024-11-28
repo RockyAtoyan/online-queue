@@ -16,7 +16,7 @@ export class CompaniesService {
         events: {
           include: {
             appointments: {
-              include: { duration: true, event: true },
+              include: { duration: true, event: true, customer: true },
             },
           },
         },
