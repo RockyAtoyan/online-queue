@@ -82,7 +82,7 @@ export class AppointmentsService {
           event: {
             include: {
               company: {
-                select: { name: true },
+                include: { emailHtml: true },
               },
             },
           },
@@ -99,6 +99,7 @@ export class AppointmentsService {
       });
       await this.mailService.sendCustomerDeleteAppointmentMail(
         appointment.event.company.name,
+        appointment.event.company.emailHtml,
         appointment.customer,
       );
       return appointment;

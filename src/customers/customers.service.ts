@@ -29,8 +29,8 @@ export class CustomersService {
               event: {
                 include: {
                   company: {
-                    select: {
-                      name: true,
+                    include: {
+                      emailHtml: true,
                     },
                   },
                 },
@@ -42,6 +42,7 @@ export class CustomersService {
       });
       await this.mailService.sendCustomerAppointment(
         customer.appointment.event.company.name,
+        customer.appointment.event.company.emailHtml,
         customer.appointment.event.name,
         customer,
       );

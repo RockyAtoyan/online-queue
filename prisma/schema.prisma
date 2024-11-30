@@ -20,6 +20,7 @@ model Company {
   password String
   events   Event[]
   widget   Widget?
+  emailHtml    Email?
 }
 
 model Event {
@@ -84,4 +85,12 @@ model Widget {
   companyId  String  @unique
   company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customHtml String?
+}
+
+model Email {
+  id         String  @id @default(uuid())
+  companyId  String  @unique
+  company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  makeCustomHtml String?
+  unmakeCustomHtml String?
 }

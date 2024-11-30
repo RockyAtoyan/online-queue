@@ -19,6 +19,7 @@ import { DbService } from './db/db.service';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { MailModule } from './mail/mail.module';
 import { WidgetsModule } from './widgets/widgets.module';
+import { EmailsModule } from './emails/emails.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { WidgetsModule } from './widgets/widgets.module';
     DurationsModule,
     MailModule,
     WidgetsModule,
+    EmailsModule,
   ],
   controllers: [AppController],
   providers: [

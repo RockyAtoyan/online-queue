@@ -13,11 +13,11 @@ import { UpdateWidgetDto } from './dto/update-widget.dto';
 export class WidgetsService {
   engine = hbs.create();
 
-  constructor(private dvService: DbService) {}
+  constructor(private dbService: DbService) {}
 
   async findOne(id: string) {
     try {
-      const widget = await this.dvService.widget.findUnique({
+      const widget = await this.dbService.widget.findUnique({
         where: { id },
         include: {
           company: {
@@ -60,7 +60,7 @@ export class WidgetsService {
 
   async getWidgetAppointments(id: string) {
     try {
-      const widget = await this.dvService.widget.findUnique({
+      const widget = await this.dbService.widget.findUnique({
         where: { id },
         include: {
           company: {
@@ -93,7 +93,7 @@ export class WidgetsService {
 
   async create(createWidgetDto: CreateWidgetDto) {
     try {
-      const widget = await this.dvService.widget.create({
+      const widget = await this.dbService.widget.create({
         data: createWidgetDto,
       });
       return widget;
@@ -105,7 +105,7 @@ export class WidgetsService {
 
   async update(id: string, updateWidgetDto: UpdateWidgetDto) {
     try {
-      const widget = await this.dvService.widget.update({
+      const widget = await this.dbService.widget.update({
         where: { id },
         data: updateWidgetDto,
       });
@@ -118,7 +118,7 @@ export class WidgetsService {
 
   async remove(id: string) {
     try {
-      const widget = await this.dvService.widget.delete({
+      const widget = await this.dbService.widget.delete({
         where: { id },
       });
       return widget;
