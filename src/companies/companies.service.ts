@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { hashSync } from 'bcrypt';
 import { DbService } from '../db/db.service';
 import { EmailsService } from './../emails/emails.service';
 import { WidgetsService } from './../widgets/widgets.service';
@@ -40,6 +41,23 @@ export class CompaniesService {
       await this.widgetsService.create({ companyId: company.id });
       await this.emailsService.create({ companyId: company.id });
       return company;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException();
+    }
+  }
+
+  async update(id: string, dto: Prisma.CompanyUpdateInput) {
+    try {
+      if (dto.password) {
+        dto.password = hashSync(String(dto.password), 10);
+      }
+      const company = await this.dbService.company.update({
+        where: { id },
+        data: dto,
+      });
+      const { password, ...rest } = company;
+      return rest;
     } catch (error) {
       console.log(error);
       throw new BadRequestException();
