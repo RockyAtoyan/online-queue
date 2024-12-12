@@ -43,6 +43,27 @@ export class AuthService {
     return { accessToken, ...result };
   }
 
+  async signInWithOAuth(email: string, name: string) {
+    let company = await this.companiesService.findOne(email);
+    if (!company) {
+      const newCompany = await this.companiesService.create({
+        email,
+        name,
+        password: '',
+      });
+      company = await this.companiesService.findOne(email);
+    }
+    const { password: pass, ...result } = company;
+    const accessToken = await this.jwtService.signAsync(
+      { email: result.email, id: result.id, name: result.name },
+      {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '90d',
+      },
+    );
+    return { accessToken, ...result };
+  }
+
   async auth(accessToken?: string) {
     if (!accessToken) throw new UnauthorizedException();
     try {
