@@ -8,6 +8,31 @@
       <p class='online-queue-widget__text'>Связаться с нами можно по почте
         <span style='text-decoration: underline;'>{{email}}</span></p>
     </div>
+    <div class='online-queue-widget__select'>
+      <details class='online-queue-widget__select__inner'>
+        <summary class='online-queue-widget__select__radios'>
+          <input
+            id='online-queue-widget__select__input'
+            value=''
+            placeholder='Выберите мероприятие'
+            checked
+          />
+        </summary>
+        <ul class='online-queue-widget__select__list'>
+          {{#each events}}
+            <li>
+              <label
+                data-event-id='{{this.id}}'
+                data-event-name='{{this.name}}'
+                class='online-queue-widget__select__label'
+              >{{this.name}}</label>
+            </li>
+          {{else}}
+            <p class='empty'>No content</p>
+          {{/each}}
+        </ul>
+      </details>
+    </div>
     <div id='online-queue-calendar'>
       <strong>Календарь</strong>
     </div>

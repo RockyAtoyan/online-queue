@@ -3,6 +3,7 @@ class Widget {
 
   url_widget = 'http://localhost:3000/widgets/';
   url_style = 'http://localhost:3000/css/style.css';
+  appointments = [];
 
   currentEvent;
 
@@ -35,6 +36,7 @@ class Widget {
                 'online-queue-calendar',
               );
               if (!calendarRoot) return;
+              this.appointments = data;
               calendarRoot.innerHTML = '';
               const calendar = new FullCalendar.Calendar(calendarRoot, {
                 initialView: 'dayGridMonth',
@@ -102,6 +104,36 @@ class Widget {
                     this.closeSuccess();
                     this.closeError();
                     this.closeForm();
+                  });
+                });
+              document
+                .querySelectorAll('.online-queue-widget__select__label')
+                .forEach((label) => {
+                  label.addEventListener('click', () => {
+                    const input = document.getElementById(
+                      'online-queue-widget__select__input',
+                    );
+                    if (input) {
+                      const eventId = label.getAttribute('data-event-id');
+                      const eventName = label.getAttribute('data-event-name');
+                      if (eventId) {
+                        input.value = eventName;
+                        const appointments = this.appointments.filter(
+                          (app) => app.event.id === eventId,
+                        );
+                        if (appointments) {
+                          calendar.batchRendering(() => {
+                            calendar
+                              .getEvents()
+                              .forEach((event) => event.remove());
+                            calendar.addEventSource(appointments);
+                          });
+                        }
+                      }
+                    }
+                    document
+                      .querySelector('.online-queue-widget__select__inner')
+                      ?.removeAttribute('open');
                   });
                 });
             });

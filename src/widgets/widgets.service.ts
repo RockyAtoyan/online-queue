@@ -44,6 +44,7 @@ export class WidgetsService {
       const renderData = {
         name: widget.company.name,
         email: widget.company.email,
+        events: widget.company.events,
       };
       if (widget.customHtml) {
         const template = this.engine.handlebars.compile(widget.customHtml, {});
@@ -82,6 +83,7 @@ export class WidgetsService {
           },
         },
       });
+      const events = await this.dbService.event.findMany();
 
       const appointments = this.serializedAppointments(widget.company.events);
       return appointments;
